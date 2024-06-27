@@ -345,6 +345,11 @@ const char *COMPASS_POINT_NOTATION[32] = {
    "W",  "WzN",   "WNW",  "NWzW",  "NW", "NWzN",  "NNW",  "NzW",
 };
 
+// FILESYSTEM & DOWNLOAD ERRORS
+const char *TXT_FS_ERROR_BEGIN      = "Fehler: LittleFS kann nicht gestartet werden";
+const char *TXT_FS_ERROR_LOAD_FILE  = "Fehler: Einlesen der Bilddatei fehlgeschlagen";
+const char *TXT_HTTP_ERROR_DOWNLOAD = "Fehler: Download der Bilddatei fehlgeschlagen";
+
 // HTTP CLIENT ERRORS
 const char *TXT_HTTPC_ERROR_CONNECTION_REFUSED   = "Connection Refused";
 const char *TXT_HTTPC_ERROR_SEND_HEADER_FAILED   = "Send Header Failed";

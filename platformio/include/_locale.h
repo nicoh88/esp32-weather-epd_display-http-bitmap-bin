@@ -168,6 +168,11 @@ extern const char *UNITED_STATES_AQI_TXT[6];
 // COMPASS POINT
 extern const char *COMPASS_POINT_NOTATION[32];
 
+// FILESYSTEM & DOWNLOAD ERRORS
+extern const char *TXT_FS_ERROR_BEGIN;
+extern const char *TXT_FS_ERROR_LOAD_FILE;
+extern const char *TXT_HTTP_ERROR_DOWNLOAD;
+
 // HTTP CLIENT ERRORS
 extern const char *TXT_HTTPC_ERROR_CONNECTION_REFUSED;
 extern const char *TXT_HTTPC_ERROR_SEND_HEADER_FAILED;

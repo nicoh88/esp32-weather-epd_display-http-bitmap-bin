@@ -41,8 +41,8 @@
 #include "LittleFS.h"
 
 // too large to allocate locally on stack
-static owm_resp_onecall_t       owm_onecall;
-static owm_resp_air_pollution_t owm_air_pollution;
+//static owm_resp_onecall_t       owm_onecall;
+//static owm_resp_air_pollution_t owm_air_pollution;
 
 Preferences prefs;
 
@@ -139,8 +139,8 @@ bool downloadImageToFS(const char* url, const char* path, size_t* fileSize) {
   WiFiClientSecure client;
   HTTPClient http;
 
-  Serial.print("Downloading file: ");
-  Serial.println(url);
+  //Serial.print("Downloading file: ");
+  //Serial.println(url);
 
   client.setInsecure(); // SSL-Zertifikatsprüfung deaktivieren
   http.begin(client, url);
@@ -153,7 +153,7 @@ bool downloadImageToFS(const char* url, const char* path, size_t* fileSize) {
 
     File file = LittleFS.open(path, FILE_WRITE);
     if (!file) {
-      Serial.println("Failed to open file for writing");
+      //Serial.println("Error: Failed to open file for writing");
       http.end();
       return false;
     }
@@ -173,11 +173,11 @@ bool downloadImageToFS(const char* url, const char* path, size_t* fileSize) {
 
     file.close();
     http.end();
-    Serial.printf("Download complete, saved to %s\n", path);
-    Serial.printf("File size: %d bytes\n", *fileSize);
+    //Serial.printf("Download complete, saved to %s\n", path);
+    //Serial.printf("File size: %d bytes\n", *fileSize);
     return true;
   } else {
-    Serial.printf("Error downloading image, HTTP code: %d\n", httpCode);
+    //Serial.printf("Error: Downloading image, HTTP code: %d\n", httpCode);
     http.end();
     return false;
   }
@@ -188,14 +188,12 @@ bool downloadImageToFS(const char* url, const char* path, size_t* fileSize) {
 bool loadBitmapFromFile(const char* path, uint8_t** data, size_t* size) {
   File file = LittleFS.open(path, FILE_READ);
   if (!file) {
-    Serial.println("Error: Could not open file");
     return false;
   }
 
   *size = file.size();
   *data = (uint8_t*)malloc(*size);
   if (!*data) {
-    Serial.println("Error: Could not allocate memory");
     file.close();
     return false;
   }
@@ -331,6 +329,7 @@ void setup()
     beginDeepSleep(startTime, &timeInfo);
   }
 
+/*
   // MAKE API REQUESTS
 #ifdef USE_HTTP
   WiFiClient client;
@@ -406,16 +405,58 @@ void setup()
     Serial.println(statusStr);
   }
   digitalWrite(PIN_BME_PWR, LOW);
+*/
 
   String refreshTimeStr;
   getRefreshTimeStr(refreshTimeStr, timeConfigured, &timeInfo);
   String dateStr;
   getDateStr(dateStr, &timeInfo);
 
+  if (!LittleFS.begin()) {
+    if (!formatLittleFS() || !LittleFS.begin()) {
+      killWiFi();
+      initDisplay();
+      do
+      {
+        drawError(error_icon_196x196, TXT_FS_ERROR_BEGIN);
+      } while (display.nextPage());
+      powerOffDisplay();
+      beginDeepSleep(startTime, &timeInfo);
+      return;
+    }
+  }
+
+  size_t fileSize;
+  uint8_t* bitmapData;
+   size_t bitmapSize;  
+  if (downloadImageToFS(bitmapURL, bitmapPATH, &fileSize)) {
+    killWiFi();
+    if (loadBitmapFromFile(bitmapPATH, &bitmapData, &bitmapSize)) {  
+    } else {
+      initDisplay();
+      do
+      {
+        drawError(error_icon_196x196, TXT_FS_ERROR_LOAD_FILE);
+      } while (display.nextPage());
+      powerOffDisplay();
+      beginDeepSleep(startTime, &timeInfo);
+    }
+  } else {
+    killWiFi();
+    initDisplay();
+      do
+      {
+        drawError(wi_cloud_down_196x196, TXT_HTTP_ERROR_DOWNLOAD);
+      } while (display.nextPage());
+      powerOffDisplay();
+      beginDeepSleep(startTime, &timeInfo);
+  }
+
   // RENDER FULL REFRESH
   initDisplay();
   do
   {
+    /*
     drawCurrentConditions(owm_onecall.current, owm_onecall.daily[0],
                           owm_air_pollution, inTemp, inHumidity);
     drawForecast(owm_onecall.daily, timeInfo);
@@ -424,7 +465,11 @@ void setup()
 #if DISPLAY_ALERTS
     drawAlerts(owm_onecall.alerts, CITY_STRING, dateStr);
 #endif
+    */
+
+    display.drawGreyPixmap(bitmapData, 2, 0, 0, 800, 480);
     drawStatusBar(statusStr, refreshTimeStr, wifiRSSI, batteryVoltage);
+
   } while (display.nextPage());
   powerOffDisplay();
 
