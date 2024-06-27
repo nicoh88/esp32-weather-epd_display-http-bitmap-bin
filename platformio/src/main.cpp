@@ -37,6 +37,9 @@
   #include "cert.h"
 #endif
 
+#include <HTTPClient.h>
+#include "LittleFS.h"
+
 // too large to allocate locally on stack
 static owm_resp_onecall_t       owm_onecall;
 static owm_resp_air_pollution_t owm_air_pollution;
@@ -116,6 +119,91 @@ void beginDeepSleep(unsigned long &startTime, tm *timeInfo)
   Serial.println(" " + String(sleepDuration) + "s");
   esp_deep_sleep_start();
 } // end beginDeepSleep
+
+/* LittleFS formating
+ */
+bool formatLittleFS() {
+  Serial.println("Format LittleFS...");
+  if (LittleFS.format()) {
+    Serial.println("LittleFS successfully formatted");
+    return true;
+  } else {
+    Serial.println("Error: Could not format LittleFS");
+    return false;
+  }
+}
+
+/* Function to download a file from a URL and save it to LittleFS
+ */
+bool downloadImageToFS(const char* url, const char* path, size_t* fileSize) {
+  WiFiClientSecure client;
+  HTTPClient http;
+
+  Serial.print("Downloading file: ");
+  Serial.println(url);
+
+  client.setInsecure(); // SSL-Zertifikatsprüfung deaktivieren
+  http.begin(client, url);
+  int httpCode = http.GET();
+
+  if (httpCode == HTTP_CODE_OK) {
+    WiFiClient* stream = http.getStreamPtr();
+    *fileSize = http.getSize();
+    int remainingSize = *fileSize;
+
+    File file = LittleFS.open(path, FILE_WRITE);
+    if (!file) {
+      Serial.println("Failed to open file for writing");
+      http.end();
+      return false;
+    }
+
+    uint8_t buff[512];
+    while (http.connected() && (remainingSize > 0 || remainingSize == -1)) {
+      int size = stream->available();
+      if (size) {
+        int c = stream->readBytes(buff, ((size > sizeof(buff)) ? sizeof(buff) : size));
+        file.write(buff, c);
+        if (remainingSize > 0) {
+          remainingSize -= c;
+        }
+      }
+      delay(1);
+    }
+
+    file.close();
+    http.end();
+    Serial.printf("Download complete, saved to %s\n", path);
+    Serial.printf("File size: %d bytes\n", *fileSize);
+    return true;
+  } else {
+    Serial.printf("Error downloading image, HTTP code: %d\n", httpCode);
+    http.end();
+    return false;
+  }
+}
+
+/* Function to load Bitmap to buffer
+ */
+bool loadBitmapFromFile(const char* path, uint8_t** data, size_t* size) {
+  File file = LittleFS.open(path, FILE_READ);
+  if (!file) {
+    Serial.println("Error: Could not open file");
+    return false;
+  }
+
+  *size = file.size();
+  *data = (uint8_t*)malloc(*size);
+  if (!*data) {
+    Serial.println("Error: Could not allocate memory");
+    file.close();
+    return false;
+  }
+
+  file.read(*data, *size);
+  file.close();
+  return true;
+}
 
 /* Program entry point.
  */

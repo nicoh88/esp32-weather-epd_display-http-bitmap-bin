@@ -275,6 +275,8 @@ extern const char *WIFI_SSID;
 extern const char *WIFI_PASSWORD;
 extern const unsigned long WIFI_TIMEOUT;
 extern const unsigned HTTP_CLIENT_TCP_TIMEOUT;
+extern const char * bitmapPATH;
+extern const char * bitmapURL;
 extern const String OWM_APIKEY;
 extern const String OWM_ENDPOINT;
 extern const String OWM_ONECALL_VERSION;
