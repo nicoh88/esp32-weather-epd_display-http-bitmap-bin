@@ -11,7 +11,7 @@
 //
 // Library: https://github.com/ZinggJM/GxEPD2
 
-#include ".h"
+#include "GxEPD2_750_T7Y.h"
 
 GxEPD2_750_T7Y::GxEPD2_750_T7Y(int16_t cs, int16_t dc, int16_t rst, int16_t busy) :
   GxEPD2_4G_EPD(cs, dc, rst, busy, LOW, 10000000, WIDTH, HEIGHT, panel, hasColor, hasPartialUpdate, hasFastPartialUpdate)

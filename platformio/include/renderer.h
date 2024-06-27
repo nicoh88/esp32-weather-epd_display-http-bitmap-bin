@@ -24,34 +24,17 @@
 #include "api_response.h"
 #include "config.h"
 
-#ifdef DISP_BW_V2
-  #define DISP_WIDTH  800
-  #define DISP_HEIGHT 480
-  #include <GxEPD2_BW.h>
-  extern GxEPD2_BW<GxEPD2_750_T7,
-                   GxEPD2_750_T7::HEIGHT> display;
-#endif
-#ifdef DISP_3C_B
-  #define DISP_WIDTH  800
-  #define DISP_HEIGHT 480
-  #include <GxEPD2_3C.h>
-  extern GxEPD2_3C<GxEPD2_750c_Z08,
-                   GxEPD2_750c_Z08::HEIGHT / 2> display;
-#endif
-#ifdef DISP_7C_F
-  #define DISP_WIDTH  800
-  #define DISP_HEIGHT 480
-  #include <GxEPD2_7C.h>
-  extern GxEPD2_7C<GxEPD2_730c_GDEY073D46, 
-                   GxEPD2_730c_GDEY073D46::HEIGHT / 4> display;
-#endif
-#ifdef DISP_BW_V1
-  #define DISP_WIDTH  640
-  #define DISP_HEIGHT 384
-  #include <GxEPD2_BW.h>
-  extern GxEPD2_BW<GxEPD2_750,
-                   GxEPD2_750::HEIGHT> display;
-#endif
+#define DISP_WIDTH  800
+#define DISP_HEIGHT 480
+#include <GxEPD2_4G_4G.h>
+#define GxEPD2_DISPLAY_CLASS GxEPD2_4G_4G
+#define GxEPD2_DRIVER_CLASS GxEPD2_750_T7Y
+#define MAX_DISPLAY_BUFFER_SIZE 65536ul // e.g.
+#define MAX_HEIGHT(EPD) (EPD::HEIGHT <= MAX_DISPLAY_BUFFER_SIZE / (EPD::WIDTH / 4) ? EPD::HEIGHT : MAX_DISPLAY_BUFFER_SIZE / (EPD::WIDTH / 4))
+
+extern GxEPD2_DISPLAY_CLASS<GxEPD2_DRIVER_CLASS, 
+                            MAX_HEIGHT(GxEPD2_DRIVER_CLASS)> display;
+
 
 typedef enum alignment
 {
