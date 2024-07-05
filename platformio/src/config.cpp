@@ -37,11 +37,6 @@ const uint8_t PIN_EPD_SCK  = 18;
 const uint8_t PIN_EPD_MISO = 19; // 19 Master-In Slave-Out not used, as no data from display
 const uint8_t PIN_EPD_MOSI = 23;
 const uint8_t PIN_EPD_PWR  = 26; // Irrelevant if directly connected to 3.3V
-// I2C Pins used for BME280
-const uint8_t PIN_BME_SDA = 17;
-const uint8_t PIN_BME_SCL = 16;
-const uint8_t PIN_BME_PWR =  4;   // Irrelevant if directly connected to 3.3V
-const uint8_t BME_ADDRESS = 0x76; // If sensor does not work, try 0x77
 
 // WIFI
 const char *WIFI_SSID     = "ssid";
@@ -59,6 +54,43 @@ const unsigned HTTP_CLIENT_TCP_TIMEOUT = 10000; // ms
 // URL der Binärdatei
 const char* bitmapPATH = "/image.bin";
 const char* bitmapURL = "https://domain.tld/weatherdata.bin";
+
+// Sleep duration in minutes. (aka how often esp32 will wake for an update)
+// Aligned to the nearest minute boundary and must evenly divide 60.
+// For example, if set to 30 (minutes) the display will update at 00 or 30
+// minutes past the hour. (range: [2-60])
+//const long SLEEP_DURATION = 30;
+const long SLEEP_DURATION = 15;
+
+// BATTERY
+// To protect the battery upon LOW_BATTERY_VOLTAGE, the display will cease to
+// update until battery is charged again. The ESP32 will deep-sleep (consuming
+// < 11μA), waking briefly check the voltage at the corresponding interval (in
+// minutes). Once the battery voltage has fallen to CRIT_LOW_BATTERY_VOLTAGE,
+// the esp32 will hibernate and a manual press of the reset (RST) button to
+// begin operating again.
+const uint32_t MAX_BATTERY_VOLTAGE      = 4200; // (millivolts)
+const uint32_t WARN_BATTERY_VOLTAGE     = 3400; // (millivolts)
+const uint32_t LOW_BATTERY_VOLTAGE      = 3200; // (millivolts)
+const uint32_t VERY_LOW_BATTERY_VOLTAGE = 3100; // (millivolts)
+const uint32_t CRIT_LOW_BATTERY_VOLTAGE = 3000; // (millivolts)
+const unsigned long LOW_BATTERY_SLEEP_INTERVAL      = 30;  // (minutes)
+const unsigned long VERY_LOW_BATTERY_SLEEP_INTERVAL = 120; // (minutes)
+
+
+/*
+//
+// USED VARIABLES ABOVE IT
+//
+// UNUSED VARIABLES UNDERNEATH
+//
+*/
+
+// I2C Pins used for BME280
+const uint8_t PIN_BME_SDA = 17;
+const uint8_t PIN_BME_SCL = 16;
+const uint8_t PIN_BME_PWR =  4;   // Irrelevant if directly connected to 3.3V
+const uint8_t BME_ADDRESS = 0x76; // If sensor does not work, try 0x77
 
 // OPENWEATHERMAP API
 // OpenWeatherMap API key, https://openweathermap.org/
@@ -83,15 +115,16 @@ const String OWM_ONECALL_VERSION = "3.0";
 // LOCATION
 // Set your latitude and longitude.
 // (used to get weather data as part of API requests to OpenWeatherMap)
-const String LAT = "40.7128";
-const String LON = "-74.0060";
+const String LAT = "50.19";
+const String LON = "11.78";
 // City name that will be shown in the top-right corner of the display.
-const String CITY_STRING = "New York";
+const String CITY_STRING = "Münchberg";
 
 // TIME
 // For list of time zones see
 // https://github.com/nayarsystems/posix_tz_db/blob/master/zones.csv
-const char *TIMEZONE = "EST5EDT,M3.2.0,M11.1.0";
+//const char *TIMEZONE = "EST5EDT,M3.2.0,M11.1.0";
+const char *TIMEZONE = "CET-1CEST,M3.5.0,M10.5.0/3";
 // Time format used when displaying sunrise/set times. (Max 11 characters)
 // For more information about formatting see
 // https://man7.org/linux/man-pages/man3/strftime.3.html
@@ -113,16 +146,13 @@ const char *DATE_FORMAT = "%a, %B %e"; // ex: Sat, January 1
 const char *REFRESH_TIME_FORMAT = "%x %H:%M";
 // NTP_SERVER_1 is the primary time server, while NTP_SERVER_2 is a fallback.
 // pool.ntp.org will find the closest available NTP server to you.
-const char *NTP_SERVER_1 = "pool.ntp.org";
-const char *NTP_SERVER_2 = "time.nist.gov";
+//const char *NTP_SERVER_1 = "pool.ntp.org";
+//const char *NTP_SERVER_2 = "time.nist.gov";
+const char *NTP_SERVER_1 = "ptbtime1.ptb.de";
+const char *NTP_SERVER_2 = "ntp1.fau.de";
 // If you encounter the 'Failed To Fetch The Time' error, try increasing
 // NTP_TIMEOUT or select closer/lower latency time servers.
 const unsigned long NTP_TIMEOUT = 20000; // ms
-// Sleep duration in minutes. (aka how often esp32 will wake for an update)
-// Aligned to the nearest minute boundary and must evenly divide 60.
-// For example, if set to 30 (minutes) the display will update at 00 or 30
-// minutes past the hour. (range: [2-60])
-const long SLEEP_DURATION = 30;
 // If BED_TIME == WAKE_TIME, then this battery saving feature will be disabled.
 // (range: [0-23])
 const int BED_TIME  = 00; // Last update at 00:00 (midnight) until WAKE_TIME.
@@ -131,21 +161,6 @@ const int WAKE_TIME = 06; // Hour of first update after BED_TIME, 06:00.
 // HOURLY OUTLOOK GRAPH
 // Number of hours to display on the outlook graph. (range: [8-48])
 const int HOURLY_GRAPH_MAX = 24;
-
-// BATTERY
-// To protect the battery upon LOW_BATTERY_VOLTAGE, the display will cease to
-// update until battery is charged again. The ESP32 will deep-sleep (consuming
-// < 11μA), waking briefly check the voltage at the corresponding interval (in
-// minutes). Once the battery voltage has fallen to CRIT_LOW_BATTERY_VOLTAGE,
-// the esp32 will hibernate and a manual press of the reset (RST) button to
-// begin operating again.
-const uint32_t MAX_BATTERY_VOLTAGE      = 4200; // (millivolts)
-const uint32_t WARN_BATTERY_VOLTAGE     = 3400; // (millivolts)
-const uint32_t LOW_BATTERY_VOLTAGE      = 3200; // (millivolts)
-const uint32_t VERY_LOW_BATTERY_VOLTAGE = 3100; // (millivolts)
-const uint32_t CRIT_LOW_BATTERY_VOLTAGE = 3000; // (millivolts)
-const unsigned long LOW_BATTERY_SLEEP_INTERVAL      = 30;  // (minutes)
-const unsigned long VERY_LOW_BATTERY_SLEEP_INTERVAL = 120; // (minutes)
 
 // See config.h for the below options
 // E-PAPER PANEL
