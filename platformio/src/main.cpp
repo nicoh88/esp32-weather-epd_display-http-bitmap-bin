@@ -51,6 +51,7 @@ Preferences prefs;
  */
 void beginDeepSleep(unsigned long &startTime, tm *timeInfo)
 {
+/*
   if (!getLocalTime(timeInfo))
   {
     Serial.println(TXT_REFERENCING_OLDER_TIME_NOTICE);
@@ -111,6 +112,10 @@ void beginDeepSleep(unsigned long &startTime, tm *timeInfo)
 #if DEBUG_LEVEL >= 1
   printHeapUsage();
 #endif
+*/
+
+  uint64_t sleepDuration = 0;
+  sleepDuration += SLEEP_DURATION * 60ULL;
 
   esp_sleep_enable_timer_wakeup(sleepDuration * 1000000ULL);
   Serial.print(TXT_AWAKE_FOR);
@@ -139,8 +144,8 @@ bool downloadImageToFS(const char* url, const char* path, size_t* fileSize) {
   WiFiClientSecure client;
   HTTPClient http;
 
-  //Serial.print("Downloading file: ");
-  //Serial.println(url);
+  Serial.print("Downloading file: ");
+  Serial.println(url);
 
   client.setInsecure(); // SSL-Zertifikatsprüfung deaktivieren
   http.begin(client, url);
@@ -153,7 +158,7 @@ bool downloadImageToFS(const char* url, const char* path, size_t* fileSize) {
 
     File file = LittleFS.open(path, FILE_WRITE);
     if (!file) {
-      //Serial.println("Error: Failed to open file for writing");
+      Serial.println("Error: Failed to open file for writing");
       http.end();
       return false;
     }
@@ -173,11 +178,11 @@ bool downloadImageToFS(const char* url, const char* path, size_t* fileSize) {
 
     file.close();
     http.end();
-    //Serial.printf("Download complete, saved to %s\n", path);
-    //Serial.printf("File size: %d bytes\n", *fileSize);
+    Serial.printf("Download complete, saved to %s\n", path);
+    Serial.printf("File size: %d bytes\n", *fileSize);
     return true;
   } else {
-    //Serial.printf("Error: Downloading image, HTTP code: %d\n", httpCode);
+    Serial.printf("Error: Downloading image, HTTP code: %d\n", httpCode);
     http.end();
     return false;
   }
@@ -313,6 +318,7 @@ void setup()
     beginDeepSleep(startTime, &timeInfo);
   }
 
+/*
   // TIME SYNCHRONIZATION
   configTzTime(TIMEZONE, NTP_SERVER_1, NTP_SERVER_2);
   bool timeConfigured = waitForSNTPSync(&timeInfo);
@@ -328,6 +334,7 @@ void setup()
     powerOffDisplay();
     beginDeepSleep(startTime, &timeInfo);
   }
+*/
 
 /*
   // MAKE API REQUESTS
@@ -407,10 +414,12 @@ void setup()
   digitalWrite(PIN_BME_PWR, LOW);
 */
 
+  /*
   String refreshTimeStr;
   getRefreshTimeStr(refreshTimeStr, timeConfigured, &timeInfo);
   String dateStr;
   getDateStr(dateStr, &timeInfo);
+  */
 
   if (!LittleFS.begin()) {
     if (!formatLittleFS() || !LittleFS.begin()) {
@@ -428,7 +437,7 @@ void setup()
 
   size_t fileSize;
   uint8_t* bitmapData;
-   size_t bitmapSize;  
+  size_t bitmapSize;  
   if (downloadImageToFS(bitmapURL, bitmapPATH, &fileSize)) {
     killWiFi();
     if (loadBitmapFromFile(bitmapPATH, &bitmapData, &bitmapSize)) {  
@@ -468,7 +477,8 @@ void setup()
     */
 
     display.drawGreyPixmap(bitmapData, 2, 0, 0, 800, 480);
-    drawStatusBar(statusStr, refreshTimeStr, wifiRSSI, batteryVoltage);
+    //drawStatusBar(statusStr, refreshTimeStr, wifiRSSI, batteryVoltage);
+    drawStatusBar(statusStr, wifiRSSI, batteryVoltage);
 
   } while (display.nextPage());
   powerOffDisplay();
