@@ -143,6 +143,8 @@ bool formatLittleFS() {
 bool downloadImageToFS(const char* url, const char* path, size_t* fileSize) {
   WiFiClientSecure client;
   HTTPClient http;
+  http.setConnectTimeout(HTTP_CLIENT_TCP_TIMEOUT);
+  http.setTimeout(HTTP_CLIENT_TCP_TIMEOUT);
 
   Serial.print("Downloading file: ");
   Serial.println(url);
