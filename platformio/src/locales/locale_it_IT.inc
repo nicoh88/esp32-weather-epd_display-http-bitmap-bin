@@ -345,6 +345,11 @@ const char *COMPASS_POINT_NOTATION[32] = {
    "O",  "ObN",   "ONO",  "NObO",  "NO", "NObN",  "NNO",  "NbO",
 };
 
+// FILESYSTEM & DOWNLOAD ERRORS
+const char *TXT_FS_ERROR_BEGIN      = "Error: LittleFS could not be started";
+const char *TXT_FS_ERROR_LOAD_FILE  = "Error: Loading the bitmap from the file";
+const char *TXT_HTTP_ERROR_DOWNLOAD = "Error: Downloading the bitmap";
+
 // HTTP CLIENT ERRORS
 const char *TXT_HTTPC_ERROR_CONNECTION_REFUSED   = "Connection Refused";
 const char *TXT_HTTPC_ERROR_SEND_HEADER_FAILED   = "Send Header Failed";

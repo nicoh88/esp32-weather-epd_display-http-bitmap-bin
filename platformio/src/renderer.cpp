@@ -253,7 +253,7 @@ void powerOffDisplay()
                        // minimum power use
   digitalWrite(PIN_EPD_PWR, LOW);
   return;
-} // end initDisplay
+} // end powerOffDisplay
 
 /* This function is responsible for drawing the current conditions and
  * associated icons.
