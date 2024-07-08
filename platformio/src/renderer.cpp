@@ -204,8 +204,13 @@ void drawMultiLnString(int16_t x, int16_t y, const String &text,
 
 /* Initialize e-paper display
  */
+RTC_DATA_ATTR int initCount = 0;
+
 void initDisplay()
 {
+  // Increment the count
+  initCount++;
+
   pinMode(PIN_EPD_PWR, OUTPUT);
   digitalWrite(PIN_EPD_PWR, HIGH);
 #ifdef DRIVER_WAVESHARE
@@ -227,7 +232,15 @@ void initDisplay()
   display.setTextWrap(false);
   // display.fillScreen(GxEPD_WHITE);
   display.setFullWindow();
-  display.clearScreen();
+
+  // Check if the init count is 1 or a multiple of 50
+  if (initCount == 1 || (initCount % 50 == 0)) {
+    Serial.println("initDisplay for " + String(initCount) + " times, run clearScreen");
+    display.clearScreen();
+  } else {
+    Serial.println("initDisplay for " + String(initCount) + " times");
+  }
+
   display.firstPage(); // use paged drawing mode, sets fillScreen(GxEPD_WHITE)
   return;
 } // end initDisplay
