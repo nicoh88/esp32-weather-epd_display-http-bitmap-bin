@@ -116,6 +116,7 @@ void beginDeepSleep(unsigned long &startTime, tm *timeInfo)
 
   uint64_t sleepDuration = 0;
   sleepDuration += SLEEP_DURATION * 60ULL;
+  //sleepDuration += 0.5 * 60ULL;
 
   esp_sleep_enable_timer_wakeup(sleepDuration * 1000000ULL);
   Serial.print(TXT_AWAKE_FOR);
@@ -141,7 +142,8 @@ bool formatLittleFS() {
 /* Function to download a file from a URL and save it to LittleFS
  */
 bool downloadImageToFS(const char* url, const char* path, size_t* fileSize) {
-  WiFiClientSecure client;
+  WiFiClient client;
+  WiFiClientSecure secureClient;
   HTTPClient http;
   http.setConnectTimeout(HTTP_CLIENT_TCP_TIMEOUT);
   http.setTimeout(HTTP_CLIENT_TCP_TIMEOUT);
@@ -149,8 +151,14 @@ bool downloadImageToFS(const char* url, const char* path, size_t* fileSize) {
   Serial.print("Downloading file: ");
   Serial.println(url);
 
-  client.setInsecure(); // SSL-Zertifikatsprüfung deaktivieren
-  http.begin(client, url);
+  // Check if the URL starts with "https"
+  if (strncmp(url, "https", 5) == 0) {
+    secureClient.setInsecure(); // Disable SSL certificate validation
+    http.begin(secureClient, url);
+  } else {
+    http.begin(client, url);
+  }
+
   int httpCode = http.GET();
 
   if (httpCode == HTTP_CODE_OK) {
