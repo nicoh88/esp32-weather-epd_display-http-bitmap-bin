@@ -53,7 +53,15 @@ const unsigned HTTP_CLIENT_TCP_TIMEOUT = 10000; // ms
 
 // URL der Binärdatei
 const char* bitmapPATH = "/image.bin";
-const char* bitmapURL = "https://domain.tld/weatherdata.bin";
+const char* bitmapURL = "http://192.168.1.10/weatherdata.bin";
+//const char* bitmapURL = "https://domain.tld/weatherdata.bin";
+
+// ioBroker
+const char* ioIp = "192.168.1.10";
+uint16_t ioPort = 8087;
+const char* ioDpBattery = "0_userdata.0.esp32-weather.varBatteryPercent";
+const char* ioDpBatteryVolt = "0_userdata.0.esp32-weather.varBatteryMillivolt";
+const char* ioDpRefreshTime = "0_userdata.0.esp32-weather.varRefreshTime";
 
 // Sleep duration in minutes. (aka how often esp32 will wake for an update)
 // Aligned to the nearest minute boundary and must evenly divide 60.

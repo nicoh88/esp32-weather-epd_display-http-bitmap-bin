@@ -1,5 +1,47 @@
 # ESP32 E-Paper Weather Display
 
+<p float="left">
+  <img src="showcase/nicoh88.jpg" width="33%" />
+  <img src="showcase/nicoh88_cover.jpg" width="33%" />
+  <img src="showcase/nicoh88_cover-removed.jpg" width="33%" />
+</p>
+
+Thanks to @[lmarzen](https://github.com/lmarzen) for his initial code and inspiration. 
+
+I use a [FireBeetle 2 ESP32-E](https://botland.de/arduino-kompatible-boards-dfrobot/19015-firebeetle-esp32-e-iot-wifi-bluetooth-arduino-kompatibel-dfrobot-dfr0654-6959420918362.html), a [Good Display GDEY075T7 (800 x 480) with 4 grayscales](https://www.good-display.com/product/396.html with [DESPI-C02](https://www.good-display.com/product/516.html)), [4000mAh 1S 3.7V Li-Pol battery](https://botland.de/li-pol-1s-37v-batterien/15644-akyga-4000mah-1s-37v-li-pol-akku-jst-bec-stecker-buchse-80x50x8mm-5904422343644.html) ([JST-PH connector](https://botland.de/stromkabel-und-stecker/6563-gerader-2-poliger-jst-stecker-20-mm-raster-mit-einem-draht-5904422334789.html) must be purchased separately), a [6x6mm / 5mm THT switch](https://botland.de/taktschalter/3495-taktschalter-6x6mm-5mm-tht-2pin-5st-5904422307639.html) and a [model from the 3D printer as a housing](https://www.printables.com/de/model/617446-desk-e-ink-weather-display). No temperature sensor like the BME280, the weather data is provided by my server through ioBroker, Netatmo and the Wunderground API - similar to an old project of mine [nicoh88/kindle-kt3_weatherdisplay_battery-optimized](https://github.com/nicoh88/kindle-kt3_weatherdisplay_battery-optimized)
+
+The Python script that retrieves the local weather data, replaces the variables in the SVG and then saves this graphic as PNG, JPEG and binary and makes it downloadable for the ESP32 can be found in the "server" folder.
+
+<img src="showcase/nicoh88_weatherdata.jpg"/>
+
+## Changes to the original 
+
+- GxEPD2 has been replaced with GxEPD2_4G, which supports 4 shades of gray (white, black, light gray and dark gray) and the display looks less pixelated
+- Add support for Good Display GDEY075T7 in [GxEPD2_4G](https://github.com/nicoh88/GxEPD2_4G)
+- GxEPD2_4G clearScreen only the first time and then every 50 times
+- Display recognition commented out and only the display GDEY075T7 added
+- Added logic for downloading, saving and reading a binary file for the EPD
+- Auto-Check if the URL starts with "https" or "http"
+- Transfer statistical values to local ioBroker installation via simple-api.
+- Time synchronization (NTP) deactivated, is not required, deep sleep of the ESP32 is permanently set to 15 or 30 minutes
+- All drawings which were executed on the ESP32 commented out, except the errors and the status bar (slightly changed)
+
+## FireBeetle 2 ESP32-E "Download-Mode"
+
+Visual Studio Code on the Mac can put the FireBeetle 2 ESP32-E into download mode without further action before the upload. This does not work on a Windows PC, here you have to connect pin D5 / 0 to ground (GND) to get the ESP32 into download mode so that the program can be updated.öö
+
+## Good-Display GDEY075T7
+
+I have not connected the display GDEY075T7 with the DESPI-C02 to the GPIO pin D3 / 26 - because the display has a delay of approx. 1.5 seconds after which the power supply is active before it can be initialized. That's why I connected 3.3V from DESPI-C02 directly to 3V3 of the FireBeetle.
+
+## Battery life
+
+That is absolutely impressive. Because the ESP32 doesn't have to process any weather data here but only receives a finished image and has to display it, I was able to significantly increase the battery life again. With the 4000 mAh battery, the ESP32 manages approx. 12000 display refreshes. This means that if the weather image is updated every 15 minutes, the battery will last for approx. 125 days. Using HTTP instead of HTTPS increases battery life by a further 40-60%.
+
+***
+
+## Original README.md from lmarzen
+
 This is a weather display powered by a wifi-enabled ESP32 microcontroller and a 7.5in E-Paper (aka E-ink) display. Current and forecasted weather data is obtained from the OpenWeatherMap API. A sensor provides the display with accurate indoor temperature and humidity.
 
 <p float="left">
