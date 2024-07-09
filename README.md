@@ -1,13 +1,19 @@
 # ESP32 E-Paper Weather Display
 
-<p float="left">
-  <img src="showcase/nicoh88.jpg" width="49%" />
-  <img src="showcase/nicoh88_cover-removed.jpg" width="49%" />
-</p>
+<img src="showcase/nicoh88.jpg" height="190px"/> <img src="showcase/nicoh88_cover.jpg" height="190px"/> <img src="showcase/nicoh88_cover-removed.jpg" height="190px"/>
 
 Thanks to @[lmarzen](https://github.com/lmarzen) for his initial code and inspiration. 
 
-I use a [FireBeetle 2 ESP32-E](https://botland.de/arduino-kompatible-boards-dfrobot/19015-firebeetle-esp32-e-iot-wifi-bluetooth-arduino-kompatibel-dfrobot-dfr0654-6959420918362.html), a [Good Display GDEY075T7 (800 x 480) with 4 grayscales](https://www.good-display.com/product/396.html with [DESPI-C02](https://www.good-display.com/product/516.html)), [4000mAh 1S 3.7V Li-Pol battery](https://botland.de/li-pol-1s-37v-batterien/15644-akyga-4000mah-1s-37v-li-pol-akku-jst-bec-stecker-buchse-80x50x8mm-5904422343644.html) ([JST-PH connector](https://botland.de/stromkabel-und-stecker/6563-gerader-2-poliger-jst-stecker-20-mm-raster-mit-einem-draht-5904422334789.html) must be purchased separately), a [6x6mm / 5mm THT switch](https://botland.de/taktschalter/3495-taktschalter-6x6mm-5mm-tht-2pin-5st-5904422307639.html) and a [model from the 3D printer as a housing](https://www.printables.com/de/model/617446-desk-e-ink-weather-display). No temperature sensor like the BME280, the weather data is provided by my server through ioBroker, Netatmo and the Wunderground API - similar to an old project of mine [nicoh88/kindle-kt3_weatherdisplay_battery-optimized](https://github.com/nicoh88/kindle-kt3_weatherdisplay_battery-optimized)
+I use ...
+
+- a [FireBeetle 2 ESP32-E](https://botland.de/arduino-kompatible-boards-dfrobot/19015-firebeetle-esp32-e-iot-wifi-bluetooth-arduino-kompatibel-dfrobot-dfr0654-6959420918362.html), 
+- a [Good Display GDEY075T7 800x480 with 4 grayscales](https://www.good-display.com/product/396.html) 
+- with [DESPI-C02](https://www.good-display.com/product/516.html),
+- a [4000mAh 1S 3.7V Li-Pol battery](https://botland.de/li-pol-1s-37v-batterien/15644-akyga-4000mah-1s-37v-li-pol-akku-jst-bec-stecker-buchse-80x50x8mm-5904422343644.html) ([JST-PH connector](https://botland.de/stromkabel-und-stecker/6563-gerader-2-poliger-jst-stecker-20-mm-raster-mit-einem-draht-5904422334789.html) must be purchased separately),
+- a [6x6mm / 5mm THT switch](https://botland.de/taktschalter/3495-taktschalter-6x6mm-5mm-tht-2pin-5st-5904422307639.html) and 
+- a [model from the 3D printer as a housing](https://www.printables.com/de/model/617446-desk-e-ink-weather-display). 
+
+No temperature sensor like the BME280, the weather data is provided by my server through ioBroker, Netatmo and the Wunderground API - similar to an old project of mine [nicoh88/kindle-kt3_weatherdisplay_battery-optimized](https://github.com/nicoh88/kindle-kt3_weatherdisplay_battery-optimized)
 
 The Python script that retrieves the local weather data, replaces the variables in the SVG and then saves this graphic as PNG, JPEG and binary and makes it downloadable for the ESP32 can be found in the "server" folder.
 
