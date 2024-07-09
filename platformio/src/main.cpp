@@ -218,6 +218,50 @@ bool loadBitmapFromFile(const char* path, uint8_t** data, size_t* size) {
   return true;
 }
 
+/* Function to send Data to ioBroker
+ */
+bool sendValueToIoBroker(const char* ip, uint16_t port, const char* datapoint, uint32_t value) {
+  HTTPClient http;
+  WiFiClient client;
+  char url[256];
+  char valueStr[11]; // Buffer to hold the string representation of the value (max 10 digits for uint32_t + null terminator)
+
+  // Convert the value to a string
+  snprintf(valueStr, sizeof(valueStr), "%u", value);
+
+  // Construct the URL
+  snprintf(url, sizeof(url), "http://%s:%d/set/%s?value=%s", ip, port, datapoint, valueStr);
+
+  // Print the URL for debugging
+  //Serial.print("Sending request to URL: ");
+  //Serial.println(url);
+
+  http.setConnectTimeout(HTTP_CLIENT_TCP_TIMEOUT);
+  http.setTimeout(HTTP_CLIENT_TCP_TIMEOUT);
+
+  http.begin(client, url);
+  int httpCode = http.GET();
+
+  if (httpCode > 0) {
+    // HTTP header has been sent and server response header has been handled
+    //Serial.printf("HTTP GET request sent, response code: %d\n", httpCode);
+
+    // File found at server
+    if (httpCode == HTTP_CODE_OK) {
+      //String payload = http.getString();
+      //Serial.println("Received payload:");
+      //Serial.println(payload);
+      http.end();
+      return true;
+    }
+  } else {
+    //Serial.printf("Error in HTTP GET request: %s\n", http.errorToString(httpCode).c_str());
+  }
+
+  http.end();
+  return false;
+}
+
 /* Program entry point.
  */
 void setup()
@@ -431,6 +475,7 @@ void setup()
   getDateStr(dateStr, &timeInfo);
   */
 
+  // LITTLE FS
   if (!LittleFS.begin()) {
     if (!formatLittleFS() || !LittleFS.begin()) {
       killWiFi();
@@ -445,6 +490,7 @@ void setup()
     }
   }
 
+  // DOWNLOAD IMAGE
   size_t fileSize;
   uint8_t* bitmapData;
   size_t bitmapSize;  
@@ -492,6 +538,29 @@ void setup()
 
   } while (display.nextPage());
   powerOffDisplay();
+
+  // IOBROKER
+  if (sendValueToIoBroker(ioIp, ioPort, ioDpBatteryVolt, batteryVoltage)) {
+    Serial.printf("Value '%u' sent successfully to datapoint '%s'\n", batteryVoltage, ioDpBatteryVolt);
+  } else {
+    Serial.printf("Failed to send value '%u' to datapoint '%s'\n", batteryVoltage, ioDpBatteryVolt);
+  }
+
+  uint32_t batPercent = calcBatPercent(batteryVoltage, CRIT_LOW_BATTERY_VOLTAGE, MAX_BATTERY_VOLTAGE);
+  if (sendValueToIoBroker(ioIp, ioPort, ioDpBattery, batPercent)) {
+    Serial.printf("Value '%u' sent successfully to datapoint '%s'\n", batPercent, ioDpBattery);
+  } else {
+    Serial.printf("Failed to send value '%u' to datapoint '%s'\n", batPercent, ioDpBattery);
+  }
+
+  uint32_t refreshTime = (millis() - startTime) / 1000;
+  if (sendValueToIoBroker(ioIp, ioPort, ioDpRefreshTime, refreshTime)) {
+    Serial.printf("Value '%u' sent successfully to datapoint '%s'\n", refreshTime, ioDpRefreshTime);
+  } else {
+    Serial.printf("Failed to send value '%u' to datapoint '%s'\n", refreshTime, ioDpRefreshTime);
+  }  
+
+  killWiFi(); // WiFi no longer needed
 
   // DEEP SLEEP
   beginDeepSleep(startTime, &timeInfo);
