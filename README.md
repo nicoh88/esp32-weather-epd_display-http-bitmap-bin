@@ -1,9 +1,8 @@
 # ESP32 E-Paper Weather Display
 
 <p float="left">
-  <img src="showcase/nicoh88.jpg" width="33%" />
-  <img src="showcase/nicoh88_cover.jpg" width="33%" />
-  <img src="showcase/nicoh88_cover-removed.jpg" width="33%" />
+  <img src="showcase/nicoh88.jpg" width="49%" />
+  <img src="showcase/nicoh88_cover-removed.jpg" width="49%" />
 </p>
 
 Thanks to @[lmarzen](https://github.com/lmarzen) for his initial code and inspiration. 
@@ -12,7 +11,9 @@ I use a [FireBeetle 2 ESP32-E](https://botland.de/arduino-kompatible-boards-dfro
 
 The Python script that retrieves the local weather data, replaces the variables in the SVG and then saves this graphic as PNG, JPEG and binary and makes it downloadable for the ESP32 can be found in the "server" folder.
 
+<br>
 <img src="showcase/nicoh88_weatherdata.jpg"/>
+<br>
 
 ## Changes to the original 
 
@@ -37,6 +38,8 @@ I have not connected the display GDEY075T7 with the DESPI-C02 to the GPIO pin D3
 ## Battery life
 
 That is absolutely impressive. Because the ESP32 doesn't have to process any weather data here but only receives a finished image and has to display it, I was able to significantly increase the battery life again. With the 4000 mAh battery, the ESP32 manages approx. 12000 display refreshes. This means that if the weather image is updated every 15 minutes, the battery will last for approx. 125 days. Using HTTP instead of HTTPS increases battery life by a further 40-60%.
+
+***
 
 ***
 
