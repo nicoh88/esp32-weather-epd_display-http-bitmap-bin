@@ -495,7 +495,6 @@ void setup()
   uint8_t* bitmapData;
   size_t bitmapSize;  
   if (downloadImageToFS(bitmapURL, bitmapPATH, &fileSize)) {
-    killWiFi();
     if (loadBitmapFromFile(bitmapPATH, &bitmapData, &bitmapSize)) {  
     } else {
       initDisplay();

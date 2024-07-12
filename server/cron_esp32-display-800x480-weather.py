@@ -128,19 +128,21 @@ def remove_element_by_id(output, element_id):
 
 def icon_mapping(iconcode):
 	# http://pwsdashboard.weather-template.com/documentation/wu_icons.pdf
-	# cloudy, fog, partly-cloudy-night, partly-cloudy-day, rain, sleet, snow, clear-day, clear-night, wind, thunder
-	if iconcode in [26]: 									iconname = "cloudy"
-	if iconcode in [20]: 									iconname = "fog"
-	if iconcode in [27,29]: 								iconname = "partly-cloudy-night"
-	if iconcode in [28,30]: 								iconname = "partly-cloudy-day"
-	if iconcode in [8,9,11,12,17,35,39,40,45]: 				iconname = "rain"
-	#if iconcode in [6,7,18]: 								iconname = "sleet"
-	if iconcode in [5,6,7,10,13,14,16,18,25,41,42,43,46]: 	iconname = "snow"
-	if iconcode in [32,34,36]: 								iconname = "clear-day"
-	if iconcode in [31,33]: 								iconname = "clear-night"
-	if iconcode in [0,1,2,15,19,21,22,23,24,25]: 			iconname = "wind"
-	if iconcode in [3,4,37,38,47]: 							iconname = "thunder"
-	if iconcode in [44]: 									iconname = "n/e"
+	if iconcode in [32,34,36]: 						iconname = "clear-day"
+	if iconcode in [31,33]: 						iconname = "clear-night"
+	if iconcode in [28,30]: 						iconname = "partly-cloudy-day"
+	if iconcode in [27,29]: 						iconname = "partly-cloudy-night"
+	if iconcode in [26]: 							iconname = "cloudy"
+	if iconcode in [8,9,11,12,17,35,39,40,45]: 		iconname = "rain"
+	if iconcode in [3,4,37,38,47]: 					iconname = "thunder"
+	if iconcode in [20]: 							iconname = "fog"
+	if iconcode in [15,22,23,24]: 					iconname = "wind"
+	if iconcode in [5,10,13,14,16,25,41,42,43,46]: 	iconname = "snow"
+	if iconcode in [6,7,18]: 						iconname = "sleet"
+	if iconcode in [0,1,2]: 						iconname = "hurricane"
+	if iconcode in [19]: 							iconname = "dust"
+	if iconcode in [21]: 							iconname = "haze"
+	if iconcode in [44]: 							iconname = "n/e"
 	return(iconname)
 
 def moonicon_mapping(moonphase):
@@ -210,7 +212,7 @@ def save_as_bin(img_4g, output_path):
 
 ###############################################################
 # Local Weather from ioBroker "Simple-API" über Netatmo-Adapter
-## http://192.168.137.10:8087/states?pattern=alias.0*&prettyPrint
+## http://192.168.1.10:8087/states?pattern=alias.0*&prettyPrint
 tries = 0
 max_tries = 5
 while tries < max_tries:
@@ -629,7 +631,8 @@ for ROOM in ROOMS:
 	output = asInteger(output, "$C_WIND", weatherdata_now_windspeed, "")
 	output = output.replace("$C_WIN_DIR", str(weatherdata_now_winddirection))
 	output = asInteger(output, "$C_WIN_MAX", weatherdata_now_windgust, "")
-	output = output.replace("$C_RAIN", str('%.1f' % (float(weatherdata_now_rain))))
+	#output = output.replace("$C_RAIN", str('%.1f' % (float(weatherdata_now_rain))))
+	output = asIntegerTenOrMinusTen(output, "$C_RAIN", weatherdata_now_rain, "")
 	output = output.replace("$C_SUNRISE", str(astronomy_today_sunrise))
 	output = output.replace("$C_SUNSET", str(astronomy_today_sunset))
 	output = output.replace("$C_MOON", str('%.2d' % (float(astronomy_today_moonphase))))
