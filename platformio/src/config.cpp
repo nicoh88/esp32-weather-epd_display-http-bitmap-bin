@@ -51,17 +51,21 @@ const unsigned long WIFI_TIMEOUT = 10000; // ms, WiFi connection timeout.
 //   -258 Deserialization Incomplete Input
 const unsigned HTTP_CLIENT_TCP_TIMEOUT = 10000; // ms
 
-// URL der Binärdatei
+// FS
 const char* bitmapPATH = "/image.bin";
-const char* bitmapURL = "http://192.168.1.10/weatherdata.bin";
-//const char* bitmapURL = "https://domain.tld/weatherdata.bin";
 
-// ioBroker
-const char* ioIp = "192.168.1.10";
-uint16_t ioPort = 8087;
-const char* ioDpBattery = "0_userdata.0.esp32-weather.varBatteryPercent";
-const char* ioDpBatteryVolt = "0_userdata.0.esp32-weather.varBatteryMillivolt";
-const char* ioDpRefreshTime = "0_userdata.0.esp32-weather.varRefreshTime";
+
+//
+// URLs
+//
+const char* bitmapURL = "http://192.168.1.10/weatherdata.bin"
+//const char* bitmapURL = "https://domain.tld/weatherdata.bin";
+const char* bridge_url = "http://192.168.1.10/httpBridgeToHomeassistant.php";
+
+const char* haBattery = "input_number.firebeetle_esp32_wetterdisplay_bad_batterie";
+const char* haBatteryVolt = "input_number.firebeetle_esp32_wetterdisplay_bad_batterie_spannung";
+const char* haRefreshTime = "input_number.firebeetle_esp32_wetterdisplay_bad_aktualisierungsdauer";
+
 
 // Sleep duration in minutes. (aka how often esp32 will wake for an update)
 // Aligned to the nearest minute boundary and must evenly divide 60.
