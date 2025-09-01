@@ -1,3 +1,6 @@
+.DS_Store
+/.github
 platformio/src/config_backup.cpp
 server/httpBridgeToHomeassistant_backup.php
-/.github
+
+

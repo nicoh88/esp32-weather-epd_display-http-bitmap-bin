@@ -40,11 +40,16 @@
 #include <HTTPClient.h>
 #include "LittleFS.h"
 
+#include <PubSubClient.h> // <-- HINZUFÜGEN
+
+
 // too large to allocate locally on stack
 //static owm_resp_onecall_t       owm_onecall;
 //static owm_resp_air_pollution_t owm_air_pollution;
 
 Preferences prefs;
+WiFiClient espClient;
+PubSubClient mqttClient(espClient);
 
 /* Put esp32 into ultra low-power deep sleep (<11μA).
  * Aligns wake time to the minute. Sleep times defined in config.cpp.
@@ -224,46 +229,57 @@ bool loadBitmapFromFile(const char* path, uint8_t** data, size_t* size) {
   return true;
 }
 
-/* Function to send statistic data to a Home Assistant http-bridge
+/**
+ * @brief Connects to the MQTT Broker.
+ * Dynamically builds the Client ID.
+ * @return true on success, false on failure.
  */
-bool sendValuesToBridge(const char* bridge_url, const char* entity_ids[], uint32_t values[], int num_entities) {
-  HTTPClient http;
-  http.setConnectTimeout(HTTP_CLIENT_TCP_TIMEOUT);
-  http.setTimeout(HTTP_CLIENT_TCP_TIMEOUT);
+bool connectMqtt() {
+  Serial.println("Connecting to MQTT Broker...");
+  mqttClient.setServer(MQTT_BROKER_IP, MQTT_BROKER_PORT);
   
-  http.begin(bridge_url);
+  String clientId = String(MQTT_TOPIC_PREFIX) + "_" + String(DEVICE_NAME);
 
-  // JSON-Header
-  http.addHeader("Content-Type", "application/json");
-
-  // JSON-Payload
-  String payload = "[";
-  for (int i = 0; i < num_entities; i++) {
-    payload += "{\"entity_id\": \"" + String(entity_ids[i]) + "\", \"value\": " + String(values[i]) + "}";
-    if (i < num_entities - 1) payload += ",";
-  }
-  payload += "]";
-
-  // sent HTTP-POST
-  int httpCode = http.POST(payload);
-
-  // check HTTP-Code
-  if (httpCode > 0) {
-    if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_CREATED) {
-      Serial.println("Data successfully sent.");
-      //String response = http.getString();
-      //Serial.println("Response from the Bridge: " + response);
-      http.end();
-      return true;
-    } else {
-      Serial.printf("Error: HTTP-Code: %d\n", httpCode);
-    }
+  if (mqttClient.connect(clientId.c_str(), MQTT_USER, MQTT_PASSWORD)) {
+    Serial.println("MQTT connected with Client-ID: " + clientId);
+    return true;
   } else {
-    Serial.printf("Error in HTTP POST: %s\n", http.errorToString(httpCode).c_str());
+    Serial.print("MQTT connection failed, rc=");
+    Serial.println(mqttClient.state());
+    return false;
   }
+}
 
-  http.end();
-  return false;
+/**
+ * @brief Sends the provided values to the dynamically generated MQTT topics.
+ * This function is only responsible for transmission, not calculation.
+ * @param voltage The measured battery voltage.
+ * @param percent The calculated battery percentage.
+ * @param refresh The refresh interval in minutes.
+ */
+void sendMqttData(float voltage, int percent, int refresh) {
+  char msgBuffer[10];
+  String topic; 
+
+  // Build the base topic for this device, e.g., "home/weatherdisplays/livingroom"
+  String baseTopic = String(MQTT_TOPIC_PREFIX) + "/" + String(DEVICE_NAME);
+
+  // 1. Publish Battery Voltage
+  dtostrf(voltage, 4, 2, msgBuffer);
+  topic = baseTopic + "/battery_voltage";
+  mqttClient.publish(topic.c_str(), msgBuffer, true);
+  
+  // 2. Publish Battery Percentage
+  itoa(percent, msgBuffer, 10);
+  topic = baseTopic + "/battery_percent";
+  mqttClient.publish(topic.c_str(), msgBuffer, true);
+  
+  // 3. Publish Refresh Interval
+  itoa(refresh, msgBuffer, 10);
+  topic = baseTopic + "/refresh_time_seconds";
+  mqttClient.publish(topic.c_str(), msgBuffer, true);
+
+  Serial.println("MQTT data sent to base topic: " + baseTopic);
 }
 
 
@@ -544,18 +560,19 @@ void setup()
   powerOffDisplay();
 
 
-  // HOMEASSISTANT
-  const char* ha_entity_ids[] = {haBatteryVolt, haBattery, haRefreshTime};
-
+  // HOMEASSISTANT MQTT
   uint32_t batPercent = calcBatPercent(batteryVoltage, CRIT_LOW_BATTERY_VOLTAGE, MAX_BATTERY_VOLTAGE);
   uint32_t refreshTime = (millis() - startTime) / 1000;
 
-  uint32_t values[] = {batteryVoltage, batPercent, refreshTime};
-  int num_entities = 3;
-
-  sendValuesToBridge(bridge_url, ha_entity_ids, values, num_entities);
-
-
+  if (connectMqtt()) {
+    sendMqttData(
+      batteryVoltage, 
+      batPercent, 
+      refreshTime
+    );
+    
+    mqttClient.disconnect();
+  }
 
   killWiFi(); // WiFi no longer needed
 

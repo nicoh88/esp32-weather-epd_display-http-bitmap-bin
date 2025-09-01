@@ -29,13 +29,13 @@ The Python script that retrieves the local weather data, replaces the variables 
 - Display recognition commented out and only the display GDEY075T7 added
 - Added logic for downloading, saving and reading a binary file for the EPD
 - Auto-Check if the URL starts with "https" or "http"
-- Transfer statistical values to local Home Assistant installation via a simple http to https bridge.
+- Transfer statistical values (battery, battery_voltage, refresh_time) to Home Assistant via MQTT - see [configuration.yaml example](server/homeassistant_configuration-yaml_mqtt-example.txt).
 - Time synchronization (NTP) deactivated, is not required, deep sleep of the ESP32 is permanently set to 15 or 30 minutes
 - All drawings which were executed on the ESP32 commented out, except the errors and the status bar (slightly changed)
 
 ## FireBeetle 2 ESP32-E "Download-Mode"
 
-Visual Studio Code on the Mac can put the FireBeetle 2 ESP32-E into download mode without further action before the upload. This does not work on a Windows PC, here you have to connect pin D5 / 0 to ground (GND) to get the ESP32 into download mode so that the program can be updated.öö
+Visual Studio Code on the Mac can put the FireBeetle 2 ESP32-E into download mode without further action before the upload. This does not work on all Windows PC, here you have to connect pin D5 / 0 to ground (GND) to get the ESP32 into download mode so that the program can be updated.
 
 ## Good-Display GDEY075T7
 
@@ -44,17 +44,6 @@ I have not connected the display GDEY075T7 with the DESPI-C02 to the GPIO pin D3
 ## Battery life
 
 That is absolutely impressive. Because the ESP32 doesn't have to process any weather data here but only receives a finished image and has to display it, I was able to significantly increase the battery life again. With the 4000 mAh battery, the ESP32 manages approx. 12000 display refreshes. This means that if the weather image is updated every 15 minutes, the battery will last for approx. 125 days. Using HTTP instead of HTTPS increases battery life by a further 40-60%.
-
-## HTTP Bridge for Home Assistant
-
-### Overview
-Directly sending HTTPS POST requests to Home Assistant from the ESP32 led to memory allocation errors (`SSL - Memory allocation failed`) due to limited RAM on the ESP32 when handling SSL handshakes. To work around this, an HTTP bridge was implemented.
-
-### Bridge Functionality
-The bridge script, located at `server/httpBridgeToHomeassistant.php`, receives HTTP POST data from the ESP32 and securely forwards it to the Home Assistant REST API over HTTPS. This allows the ESP32 to send data without SSL, while the bridge handles secure communication with Home Assistant. 
-
-**Note**: Ensure the bridge PHP file is hosted on an HTTP (not HTTPS) server within your network.
-
 
 ***
 

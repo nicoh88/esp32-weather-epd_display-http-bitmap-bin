@@ -1,0 +1,23 @@
+mqtt:
+  sensor:
+    - name: "Wetterdisplay Wohnzimmer Batterie"
+      unique_id: "wetterdisplay_wohnzimmer_batterie"
+      icon: "mdi:battery"
+      state_topic: "weatherdisplay/wohnzimmer/battery_percent"
+      device_class: "battery"
+      unit_of_measurement: "%"
+      state_class: "measurement"
+
+    - name: "Wetterdisplay Wohnzimmer Batterie Spannung"
+      unique_id: "wetterdisplay_wohnzimmer_batterie_spannung"
+      icon: "mdi:sine-wave"
+      state_topic: "weatherdisplay/wohnzimmer/battery_voltage"
+      device_class: "voltage"
+      unit_of_measurement: "mV"
+      state_class: "measurement"
+
+    - name: "Wetterdisplay Wohnzimmer Dauer der letzter Display-Aktualisierung"
+      unique_id: "wetterdisplay_wohnzimmer_dauer_aktualisierung"
+      icon: "mdi:refresh-circle"
+      state_topic: "weatherdisplay/wohnzimmer/refresh_time_seconds"
+      unit_of_measurement: "seconds"

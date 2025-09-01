@@ -54,17 +54,21 @@ const unsigned HTTP_CLIENT_TCP_TIMEOUT = 10000; // ms
 // FS
 const char* bitmapPATH = "/image.bin";
 
+// DEVICE
+const char* DEVICE_NAME         = "wohnzimmer";
+
+// MQTT
+const char* MQTT_BROKER_IP      = "192.168.1.10";
+const int   MQTT_BROKER_PORT    = 1883;
+const char* MQTT_USER           = "mqtt";
+const char* MQTT_PASSWORD       = "secret";
+const char* MQTT_TOPIC_PREFIX     = "weatherdisplay";
 
 //
 // URLs
 //
 const char* bitmapURL = "http://192.168.1.10/weatherdata.bin"
 //const char* bitmapURL = "https://domain.tld/weatherdata.bin";
-const char* bridge_url = "http://192.168.1.10/httpBridgeToHomeassistant.php";
-
-const char* haBattery = "input_number.firebeetle_esp32_wetterdisplay_bad_batterie";
-const char* haBatteryVolt = "input_number.firebeetle_esp32_wetterdisplay_bad_batterie_spannung";
-const char* haRefreshTime = "input_number.firebeetle_esp32_wetterdisplay_bad_aktualisierungsdauer";
 
 
 // Sleep duration in minutes. (aka how often esp32 will wake for an update)
@@ -73,6 +77,7 @@ const char* haRefreshTime = "input_number.firebeetle_esp32_wetterdisplay_bad_akt
 // minutes past the hour. (range: [2-60])
 //const long SLEEP_DURATION = 30;
 const long SLEEP_DURATION = 15;
+//const long SLEEP_DURATION = 1;
 
 // BATTERY
 // To protect the battery upon LOW_BATTERY_VOLTAGE, the display will cease to
