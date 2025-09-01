@@ -169,6 +169,7 @@ bool downloadImageToFS(const char* url, const char* path, size_t* fileSize) {
     File file = LittleFS.open(path, FILE_WRITE);
     if (!file) {
       Serial.println("Error: Failed to open file for writing");
+      client.stop();
       http.end();
       return false;
     }
@@ -187,12 +188,14 @@ bool downloadImageToFS(const char* url, const char* path, size_t* fileSize) {
     }
 
     file.close();
+    client.stop();
     http.end();
     Serial.printf("Download complete, saved to %s\n", path);
     Serial.printf("File size: %d bytes\n", *fileSize);
     return true;
   } else {
     Serial.printf("Error: Downloading image, HTTP code: %d\n", httpCode);
+    client.stop();
     http.end();
     return false;
   }
@@ -203,6 +206,7 @@ bool downloadImageToFS(const char* url, const char* path, size_t* fileSize) {
 bool loadBitmapFromFile(const char* path, uint8_t** data, size_t* size) {
   File file = LittleFS.open(path, FILE_READ);
   if (!file) {
+    Serial.println("File not found.");
     return false;
   }
 
@@ -210,11 +214,13 @@ bool loadBitmapFromFile(const char* path, uint8_t** data, size_t* size) {
   *data = (uint8_t*)malloc(*size);
   if (!*data) {
     file.close();
+    Serial.println("File has no data.");
     return false;
   }
 
   file.read(*data, *size);
   file.close();
+  Serial.println("File loaded!");
   return true;
 }
 
