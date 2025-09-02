@@ -1,9 +1,9 @@
 // Display Library for SPI e-paper panels from Dalian Good Display and boards from Waveshare.
 // Requires HW SPI and Adafruit_GFX. Caution: the e-paper panels require 3.3V supply AND data lines!
 //
-// based on Demo Example from Good Display: 
-// Panel: GDEW075T7 : http://www.e-paper-display.com/products_detail/productId=456.html
-// Controller: GD7965 : http://www.e-paper-display.com/download_detail/downloadsId=821.html
+// based on Demo Example from Good Display: https://www.good-display.com/comp/xcompanyFile/downloadNew.do?appId=24&fid=1373&id=1125
+// Panel: GDEY075T7 : https://www.good-display.com/product/396.html
+// Controller: UC8179 : https://v4.cecdn.yun300.cn/100001_1909185148/UC8179.pdf
 //
 // Author: Jean-Marc Zingg
 //
@@ -11,41 +11,48 @@
 //
 // Library: https://github.com/ZinggJM/GxEPD2
 
-#ifndef _GxEPD2_750_T7Y_H_
-#define _GxEPD2_750_T7Y_H_
+#ifndef _GxEPD2_750_GDEY075T7_H_
+#define _GxEPD2_750_GDEY075T7_H_
 
 #include "../GxEPD2_4G_EPD.h"
 
-class GxEPD2_750_T7Y : public GxEPD2_4G_EPD
+class GxEPD2_750_GDEY075T7 : public GxEPD2_4G_EPD
 {
   public:
     // attributes
     static const uint16_t WIDTH = 800;
+    static const uint16_t WIDTH_VISIBLE = WIDTH;
     static const uint16_t HEIGHT = 480;
-    static const GxEPD2_4G::Panel panel = GxEPD2_4G::GDEW075T7;
+    static const GxEPD2_4G::Panel panel = GxEPD2_4G::GDEY075T7;
     static const bool hasColor = false;
     static const bool hasPartialUpdate = true;
     static const bool usePartialUpdateWindow = false; // set false for better image
+    static const bool usePartialUpdateWindow_4G = false; // set false for acceptable image
     static const bool hasFastPartialUpdate = true; // set this false to force full refresh always
-    static const uint16_t power_on_time = 140; // ms, e.g. 134460us
-    static const uint16_t power_off_time = 42; // ms, e.g. 40033us
-    static const uint16_t full_refresh_time = 4200; // ms, e.g. 4108238us
-    static const uint16_t partial_refresh_time = 1600; // ms, e.g. 1584124us
+    static const bool useFastFullUpdate = true; // set false for extended (low) temperature range
+    static const bool useFastPartialUpdateFromOTP = true; // set this false for earlier batches, such as the panel I have (1580258us)
+    static const uint16_t power_on_time = 140; // ms, e.g. 128000us
+    static const uint16_t power_off_time = 42; // ms, e.g. 40000us
+    static const uint16_t grey_refresh_time = 2500; // ms, e.g. 2324000us
+    static const uint16_t full_refresh_time = 1200; // ms, e.g. 1168996us
+    static const uint16_t partial_refresh_time = 450; // ms, e.g. 435000us
     // constructor
-    GxEPD2_750_T7Y(int16_t cs, int16_t dc, int16_t rst, int16_t busy);
+    GxEPD2_750_GDEY075T7(int16_t cs, int16_t dc, int16_t rst, int16_t busy);
     // methods (virtual)
     //  Support for Bitmaps (Sprites) to Controller Buffer and to Screen
     void clearScreen(uint8_t value = 0xFF); // init controller memory and screen (default white)
     void writeScreenBuffer(uint8_t value = 0xFF); // init controller memory (default white)
+    void writeScreenBufferAgain(uint8_t value = 0xFF); // init previous buffer controller memory (default white)
     // write to controller memory, without screen refresh; x and w should be multiple of 8
     void writeImage(const uint8_t bitmap[], int16_t x, int16_t y, int16_t w, int16_t h, bool invert = false, bool mirror_y = false, bool pgm = false);
+    void writeImageForFullRefresh(const uint8_t bitmap[], int16_t x, int16_t y, int16_t w, int16_t h, bool invert = false, bool mirror_y = false, bool pgm = false);
+    void writeImage_4G(const uint8_t bitmap[], uint8_t bpp, int16_t x, int16_t y, int16_t w, int16_t h, bool invert = false, bool mirror_y = false, bool pgm = false);
     void writeImagePart(const uint8_t bitmap[], int16_t x_part, int16_t y_part, int16_t w_bitmap, int16_t h_bitmap,
                         int16_t x, int16_t y, int16_t w, int16_t h, bool invert = false, bool mirror_y = false, bool pgm = false);
-    void writeImage(const uint8_t* black, const uint8_t* color, int16_t x, int16_t y, int16_t w, int16_t h, bool invert = false, bool mirror_y = false, bool pgm = false);
-    void writeImage_4G(const uint8_t bitmap[], uint8_t bpp, int16_t x, int16_t y, int16_t w, int16_t h, bool invert = false, bool mirror_y = false, bool pgm = false);
-    void writeImagePart(const uint8_t* black, const uint8_t* color, int16_t x_part, int16_t y_part, int16_t w_bitmap, int16_t h_bitmap,
-                        int16_t x, int16_t y, int16_t w, int16_t h, bool invert = false, bool mirror_y = false, bool pgm = false);
     void writeImagePart_4G(const uint8_t bitmap[], uint8_t bpp, int16_t x_part, int16_t y_part, int16_t w_bitmap, int16_t h_bitmap,
+                        int16_t x, int16_t y, int16_t w, int16_t h, bool invert = false, bool mirror_y = false, bool pgm = false);
+    void writeImage(const uint8_t* black, const uint8_t* color, int16_t x, int16_t y, int16_t w, int16_t h, bool invert = false, bool mirror_y = false, bool pgm = false);
+    void writeImagePart(const uint8_t* black, const uint8_t* color, int16_t x_part, int16_t y_part, int16_t w_bitmap, int16_t h_bitmap,
                         int16_t x, int16_t y, int16_t w, int16_t h, bool invert = false, bool mirror_y = false, bool pgm = false);
     // for differential update: set current and previous buffers equal (for fast partial update to work correctly)
     // done by controller (N2OCP); override with empty code
@@ -71,6 +78,11 @@ class GxEPD2_750_T7Y : public GxEPD2_4G_EPD
     void powerOff(); // turns off generation of panel driving voltages, avoids screen fading over time
     void hibernate(); // turns powerOff() and sets controller to deep sleep for minimum power use, ONLY if wakeable by RST (rst >= 0)
   private:
+    void _writeScreenBuffer(uint8_t command, uint8_t value);
+    void _writeScreenBufferArea(uint8_t command, uint8_t value, uint16_t x, uint16_t y, uint16_t w, uint16_t h);
+    void _writeImage(uint8_t command, const uint8_t bitmap[], int16_t x, int16_t y, int16_t w, int16_t h, bool invert = false, bool mirror_y = false, bool pgm = false);
+    void _writeImagePart(uint8_t command, const uint8_t bitmap[], int16_t x_part, int16_t y_part, int16_t w_bitmap, int16_t h_bitmap,
+                         int16_t x, int16_t y, int16_t w, int16_t h, bool invert = false, bool mirror_y = false, bool pgm = false);
     void _setPartialRamArea(uint16_t x, uint16_t y, uint16_t w, uint16_t h);
     void _PowerOn();
     void _PowerOff();
